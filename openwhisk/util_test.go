@@ -77,6 +77,19 @@ func doPost(url string, message string) (string, int, error) {
 	return string(resp), res.StatusCode, nil
 }
 
+func doGet(url string) (string, int, error) {
+	res, err := http.Get(url)
+	if err != nil {
+		return "", -1, err
+	}
+	defer res.Body.Close()
+	resp, err := ioutil.ReadAll(res.Body)
+	if err != nil {
+		return "", -1, err
+	}
+	return string(resp), res.StatusCode, nil
+}
+
 func doRun(ts *httptest.Server, message string) {
 	if message == "" {
 		message = `{"name":"Mike"}`

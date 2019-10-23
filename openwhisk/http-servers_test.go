@@ -2,33 +2,17 @@ package openwhisk
 
 import (
 	"fmt"
-	"io/ioutil"
-	"net/http"
 )
 
-func ExampleHello(w http.ResponseWriter, r *http.Request) {
+func ExampleHello() {
 
 	ts, cur, log := startTestServer("")
 
-	res, err := http.Get("/hello")
-	if err != nil {
-		println(err)
-	}
+	res, _, _ := doGet(ts.URL + "/hello")
 
-	responseData, err := ioutil.ReadAll(res.Body)
+	fmt.Println(res)
 
-	defer res.Body.Close()
-
-	if err != nil {
-		println(err)
-	}
-
-	responseString := string(responseData)
-	fmt.Fprint(w, responseString)
-
-	println(res)
-
-	// Output: hello
+	// Output: hellox
 
 	stopTestServer(ts, cur, log)
 }

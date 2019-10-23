@@ -1,12 +1,10 @@
 package openwhisk
 
-import (
-	"fmt"
-	"net/http"
-)
+//	"fmt"
+//	"net/http"
 
-func hello(w http.ResponseWriter, r *http.Request) {
+//func hello(w http.ResponseWriter, r *http.Request) {
 
-	fmt.Println("hello")
+//fmt.Println("hello")
 
-}
+//}
