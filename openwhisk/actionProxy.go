@@ -134,6 +134,9 @@ func (ap *ActionProxy) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		ap.runHandler(w, r)
 	case "/hello":
 		ap.helloHandler(w, r)
+	case "/":
+		ap.rootHandler(w, r)
+
 	}
 }
 
