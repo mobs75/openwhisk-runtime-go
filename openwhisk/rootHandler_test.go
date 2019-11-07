@@ -1,11 +1,8 @@
 package openwhisk
 
 import (
-	"bytes"
 	"encoding/json"
 	"fmt"
-	"log"
-	"net/http"
 	"os"
 )
 
@@ -34,14 +31,15 @@ func ExampleRootHandler() {
 
 	fmt.Println(res)
 
-	// Output: xxx
+	// Output:
+	///xxx
 
 	stopTestServer(ts, cur, log)
 }
 
 func ExamplePreprocess() {
 
-	var s1 jsonString
+	var jsonData = `{"name":"TEST-name","main":"TEST-main","code":"TEST-code","binary":"true","env":"{"hello":"world","hi":"all"}"}`
 
 	os.Setenv("namespace", "TEST-namespace")
 	os.Setenv("action_name", "TEST-action_name")
@@ -51,18 +49,10 @@ func ExamplePreprocess() {
 	os.Setenv("transaction_id", "TEST-transaction_id")
 	os.Setenv("deadline", "9999")
 
-	var jsonData []byte
-
-	jsonData, err := json.Marshal(s1)
-	var jsonStr = []byte(`{"name": "TEST-name", "main": "TEST-main","code":"TEST-code","binary":"true","env": "{ "hello": "world", "hi": "all"}`)
-	req, err := http.NewRequest("GET", "http://localhost:8088", bytes.NewBuffer(jsonStr))
-	req.Header.Set("Content-Type", "application/json")
-
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	fmt.Printf("%s", jsonData)
+	value := value{}
+	json.Unmarshal([]byte(jsonData), &value)
+	fmt.Printf("%s", value)
 
 	// Output: xxx
+
 }

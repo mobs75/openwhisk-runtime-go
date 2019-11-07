@@ -1,8 +1,10 @@
 package openwhisk
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
+	"log"
 	"net/http"
 )
 
@@ -38,17 +40,27 @@ func (ap *ActionProxy) rootHandler(w http.ResponseWriter, r *http.Request) {
 // prede una request e ritorna un json
 func preProcess(w http.ResponseWriter, r *http.Request) []byte {
 
-	var s jsonString
-	var jsonData []byte
-	jsonData, err := json.Marshal(s)
-	if err != nil {
-		if err != nil {
-			fmt.Println(err)
-		}
-		fmt.Printf("%s", jsonData)
+	valueJSON, err := json.Marshal(value{})
 
+	req, err := http.NewRequest("GET", "http://localhost:8088", bytes.NewBuffer(valueJSON))
+	req.Header.Set("Content-Type", "application/json")
+
+	if err != nil {
+		log.Fatal(err)
 	}
-	return jsonData
+
+	fmt.Printf("%s", valueJSON)
+
+	/*
+		var s jsonString
+		var jsonData []byte
+		jsonData, err := json.Marshal(s)
+		if err != nil {
+			fmt.Printf("%s", jsonData)
+		}
+	*/
+	return xxx
+
 }
 
 /*
