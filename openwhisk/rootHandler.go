@@ -7,22 +7,22 @@ import (
 )
 
 type value struct {
-	name   string            `json:"name,omitempty"`
-	main   string            `json:"main,omitempty"`
-	code   string            `json:"code,omitempty"`
-	binary bool              `json:"binary,omitempty"`
-	env    map[string]string `json:"env,omitempty"`
+	Name   string            `json:"name,omitempty"`
+	Main   string            `json:"main,omitempty"`
+	Code   string            `json:"code,omitempty"`
+	Binary bool              `json:"binary,omitempty"`
+	Env    map[string]string `json:"env,omitempty"`
 }
 
 type jsonString struct {
-	value          value  `json:"value,omitempty"`
-	namespace      string `json:"namespace,omitempty"`
-	action_name    string `json:"action_name,omitempty"`
-	api_host       string `json:"api_host,omitempty"`
-	api_key        string `json:"api_key,omitempty"`
-	activation_id  string `json:"activation_id,omitempty"`
-	transaction_id string `json:"transaction_id,omitempty"`
-	deadline       int    `json:"deadline,omitempty"`
+	Value          value  `json:"value,omitempty"`
+	Namespace      string `json:"namespace,omitempty"`
+	Action_name    string `json:"action_name,omitempty"`
+	Api_host       string `json:"api_host,omitempty"`
+	Api_key        string `json:"api_key,omitempty"`
+	Activation_id  string `json:"activation_id,omitempty"`
+	Transaction_id string `json:"transaction_id,omitempty"`
+	Deadline       int    `json:"deadline,omitempty"`
 }
 
 func (ap *ActionProxy) rootHandler(w http.ResponseWriter, r *http.Request) {
@@ -45,7 +45,7 @@ func preProcess(w http.ResponseWriter, r *http.Request) []byte {
 		if err != nil {
 			fmt.Println(err)
 		}
-		fmt.Println(string(jsonData))
+		fmt.Printf("%s", jsonData)
 
 	}
 	return jsonData

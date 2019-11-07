@@ -14,14 +14,16 @@ func ExampleRootHandler() {
 	ts, cur, log := startTestServer("")
 
 	res, _, _ := doGet(ts.URL + "/")
+	/*
+		os.Setenv("name", "TEST-name")
+		os.Setenv("main", "TEST-main")
+		os.Setenv("code", "TEST-code")
+		os.Setenv("binary", "true")
+		os.Setenv("env", `{ "hello": "world", "hi": "all"}`)
 
-	os.Setenv("name", "TEST-name")
-	os.Setenv("main", "TEST-main")
-	os.Setenv("code", "TEST-code")
-	os.Setenv("binary", "true")
-	os.Setenv("env", `{ "hello": "world", "hi": "all"}`)
+		os.Setenv("value", `{ "name": "TEST-name", "main": "TEST-main","code":"TEST-code","binary":"true","env": "{ "hello": "world", "hi": "all"}"}`)
+	*/
 
-	os.Setenv("value", `{ "name": "TEST-name", "main": "TEST-main","code":"TEST-code","binary":"true","env": "{ "hello": "world", "hi": "all"}"}`)
 	os.Setenv("namespace", "TEST-namespace")
 	os.Setenv("action_name", "TEST-action_name")
 	os.Setenv("api_host", "TEST-action_name")
@@ -41,7 +43,6 @@ func ExamplePreprocess() {
 
 	var s1 jsonString
 
-	os.Setenv("value", `{"name": "TEST-name", "main": "TEST-main","code":"TEST-code","binary":"true","env": "{ "hello": "world", "hi": "all"}"}`)
 	os.Setenv("namespace", "TEST-namespace")
 	os.Setenv("action_name", "TEST-action_name")
 	os.Setenv("api_host", "TEST-action_name")
@@ -53,8 +54,8 @@ func ExamplePreprocess() {
 	var jsonData []byte
 
 	jsonData, err := json.Marshal(s1)
-
-	req, err := http.NewRequest("POST", "http://localhost:8088", bytes.NewBuffer(jsonData))
+	var jsonStr = []byte(`{"name": "TEST-name", "main": "TEST-main","code":"TEST-code","binary":"true","env": "{ "hello": "world", "hi": "all"}`)
+	req, err := http.NewRequest("GET", "http://localhost:8088", bytes.NewBuffer(jsonStr))
 	req.Header.Set("Content-Type", "application/json")
 
 	if err != nil {
