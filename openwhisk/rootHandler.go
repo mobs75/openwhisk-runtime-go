@@ -4,7 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"log"
+	"io/ioutil"
 	"net/http"
 )
 
@@ -40,26 +40,35 @@ func (ap *ActionProxy) rootHandler(w http.ResponseWriter, r *http.Request) {
 // prede una request e ritorna un json
 func preProcess(w http.ResponseWriter, r *http.Request) []byte {
 
-	valueJSON, err := json.Marshal(value{})
-
-	req, err := http.NewRequest("GET", "http://localhost:8088", bytes.NewBuffer(valueJSON))
-	req.Header.Set("Content-Type", "application/json")
-
+	b, err := ioutil.ReadAll(r.Body)
+	defer r.Body.Close()
 	if err != nil {
-		log.Fatal(err)
+		http.Error(w, err.Error(), 500)
 	}
 
-	fmt.Printf("%s", valueJSON)
+	var val value
 
-	/*
-		var s jsonString
-		var jsonData []byte
-		jsonData, err := json.Marshal(s)
-		if err != nil {
-			fmt.Printf("%s", jsonData)
-		}
-	*/
-	return xxx
+	err = json.Unmarshal(b, &val)
+	if err != nil {
+		http.Error(w, err.Error(), 500)
+	}
+
+	output, err := json.Marshal(val)
+	if err != nil {
+		http.Error(w, err.Error(), 500)
+	}
+
+	w.Header().Set("content-type", "application/json")
+	w.Write(output)
+
+	var jsonStr jsonString
+
+	valuStr := bytes.NewBuffer(output).String()
+	fmt.Println("valuStr: ", valuStr)
+
+	fmt.Println("jsonStr: ", jsonStr)
+
+	return output
 
 }
 
