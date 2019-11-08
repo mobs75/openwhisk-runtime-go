@@ -12,13 +12,14 @@ func ExampleRootHandler() {
 
 	res, _, _ := doGet(ts.URL + "/")
 
-	os.Setenv("namespace", "TEST-namespace")
-	os.Setenv("action_name", "TEST-action_name")
-	os.Setenv("api_host", "TEST-action_name")
-	os.Setenv("api_key", "TEST-")
-	os.Setenv("activation_id", "TEST-api_key")
-	os.Setenv("transaction_id", "TEST-transaction_id")
-	os.Setenv("deadline", "9999")
+	os.Setenv("value", "JSON")
+	os.Setenv("namespace", "__OW_NAMESPACE")
+	os.Setenv("action_name", "__OW_ACTION_NAME")
+	os.Setenv("api_host", "__OW_API_HOST")
+	os.Setenv("api_key", "__OW_API_KEY")
+	os.Setenv("activation_id", "__OW_ACTIVATION_ID")
+	os.Setenv("transaction_id", "__OW_TRANSACTION_ID")
+	os.Setenv("deadline", "__OW_DEADLINE")
 
 	fmt.Println(res)
 
@@ -31,17 +32,18 @@ func ExamplePreprocess() {
 
 	var jsonData = `{"name":"TEST-name","main":"TEST-main","code":"TEST-code","binary":"true","env":"{"hello":"world","hi":"all"}"}`
 
-	os.Setenv("namespace", "TEST-namespace")
-	os.Setenv("action_name", "TEST-action_name")
-	os.Setenv("api_host", "TEST-action_name")
-	os.Setenv("api_key", "TEST-")
-	os.Setenv("activation_id", "TEST-api_key")
-	os.Setenv("transaction_id", "TEST-transaction_id")
-	os.Setenv("deadline", "9999")
+	os.Setenv("value", "JSON")
+	os.Setenv("namespace", "__OW_NAMESPACE")
+	os.Setenv("action_name", "__OW_ACTION_NAME")
+	os.Setenv("api_host", "__OW_API_HOST")
+	os.Setenv("api_key", "__OW_API_KEY")
+	os.Setenv("activation_id", "__OW_ACTIVATION_ID")
+	os.Setenv("transaction_id", "__OW_TRANSACTION_ID")
+	os.Setenv("deadline", "__OW_DEADLINE")
 
 	value := value{}
 	json.Unmarshal([]byte(jsonData), &value)
-	fmt.Printf("%s", value)
+	fmt.Println(value)
 
 	// Output: xxx
 
