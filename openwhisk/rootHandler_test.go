@@ -1,10 +1,11 @@
 package openwhisk
 
 import (
+	"bytes"
+	"encoding/json"
 	"fmt"
 	"net/http"
 	"os"
-	"strings"
 )
 
 func ExampleRootHandler() {
@@ -32,7 +33,7 @@ func ExampleRootHandler() {
 
 func ExamplePreprocess() {
 
-	var jsonData = `{"name":"TEST-name","main":"TEST-main","code":"TEST-code","binary":"true","env":"{"hello":"world","hi":"all"}"}`
+	jsonData := []byte(`{"name":"TEST-name","main":"TEST-main","code":"TEST-code","binary":"true","env":"{"hello":"world","hi":"all"}"}`)
 
 	os.Setenv("value", "JSON")
 	os.Setenv("namespace", "__OW_NAMESPACE")
@@ -43,14 +44,21 @@ func ExamplePreprocess() {
 	os.Setenv("transaction_id", "__OW_TRANSACTION_ID")
 	os.Setenv("deadline", "__OW_DEADLINE")
 
+	var aw actionWrapper
+	json.Unmarshal(jsonData, &aw)
+	fmt.Printf("%s", aw.Value)
+
 	url := "http://127.0.0.1:8888"
-	r, err := http.NewRequest("GET", url, strings.NewReader(jsonData))
+	//r, err := http.NewRequest("POST", url, strings.NewReader(jsonData))
+	r, err := http.NewRequest("POST", url, bytes.NewBuffer(jsonData))
 	//r.Header.Set("Content-Type", "application/json")
+
 	if err != nil {
 		fmt.Println(err)
 	}
 	var jsonByte []byte = preProcess(r)
-	fmt.Sprintf("%s", jsonByte)
+	fmt.Printf("4")
+	fmt.Printf("%s", jsonByte)
 
 	// Output:
 	// xxx

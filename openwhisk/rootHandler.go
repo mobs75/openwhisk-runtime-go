@@ -26,7 +26,7 @@ func (ap *ActionProxy) rootHandler(w http.ResponseWriter, r *http.Request) {
 	var jsonByte []byte = preProcess(r)
 	var jsonStr string = fmt.Sprintf("%s", jsonByte)
 	if jsonStr != "" {
-		fmt.Sprintf("%s", jsonStr)
+		fmt.Printf("%s", jsonStr)
 	}
 
 }
@@ -47,7 +47,8 @@ func preProcess(r *http.Request) []byte {
 		fmt.Println(err)
 	}
 
-	fmt.Printf("%v\n%v\n", err, val)
+	//fmt.Printf("%v\n%v\n", err, val)
+	fmt.Printf("%s", val)
 
 	output, err := json.Marshal(val)
 	if err != nil {
@@ -57,11 +58,12 @@ func preProcess(r *http.Request) []byte {
 	var aw actionWrapper
 
 	valuStr := bytes.NewBuffer(output).String()
-	fmt.Sprintf("%s", valuStr)
+	fmt.Printf("1")
+	fmt.Printf("%s", valuStr)
 
 	aw.Value = val
-
-	fmt.Sprintf("%s", aw.Value)
+	fmt.Printf("2")
+	fmt.Printf("%s", aw.Value)
 
 	aw.Namespace = os.Getenv("__OW_NAMESPACE")
 	aw.Action_name = os.Getenv("__OW_ACTION_NAME")
@@ -79,7 +81,8 @@ func preProcess(r *http.Request) []byte {
 	if err != nil {
 		fmt.Println(err)
 	}
-	fmt.Sprintf("%s", output2)
+	fmt.Println("3")
+	fmt.Printf("%s", output2)
 
 	return output2
 
