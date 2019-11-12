@@ -1,7 +1,6 @@
 package openwhisk
 
 import (
-	"bytes"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
@@ -23,48 +22,34 @@ type actionWrapper struct {
 
 func (ap *ActionProxy) rootHandler(w http.ResponseWriter, r *http.Request) {
 
-	var jsonByte []byte = preProcess(r)
-	var jsonStr string = fmt.Sprintf("%s", jsonByte)
-	if jsonStr != "" {
-		fmt.Printf("%s", jsonStr)
+	jsonByte, err := preProcess(r)
+	if err != nil {
+		fmt.Printf("%s", jsonByte)
+	} else {
+		fmt.Println(err)
 	}
 
 }
 
-// prede una request e ritorna un json
-func preProcess(r *http.Request) []byte {
+// preProcess transforms a request in an action value
+func preProcess(r *http.Request) ([]byte, error) {
 
-	b, err := ioutil.ReadAll(r.Body)
+	body, err := ioutil.ReadAll(r.Body)
 	defer r.Body.Close()
 	if err != nil {
-		fmt.Println(err)
+		return nil, err
 	}
 
 	var val map[string]interface{}
 
-	err = json.Unmarshal(b, &val)
-	if err != nil {
-		fmt.Println(err)
-	}
-
-	//fmt.Printf("%v\n%v\n", err, val)
-	fmt.Printf("%s", val)
-
-	output, err := json.Marshal(val)
+	err = json.Unmarshal(body, &val)
 	if err != nil {
 		fmt.Println(err)
 	}
 
 	var aw actionWrapper
 
-	valuStr := bytes.NewBuffer(output).String()
-	fmt.Printf("1")
-	fmt.Printf("%s", valuStr)
-
 	aw.Value = val
-	fmt.Printf("2")
-	fmt.Printf("%s", aw.Value)
-
 	aw.Namespace = os.Getenv("__OW_NAMESPACE")
 	aw.Action_name = os.Getenv("__OW_ACTION_NAME")
 	aw.Api_host = os.Getenv("__OW_API_HOST")
@@ -73,18 +58,7 @@ func preProcess(r *http.Request) []byte {
 	aw.Transaction_id = os.Getenv("__OW_TRANSACTION_ID")
 	aw.Deadline, err = strconv.ParseInt(os.Getenv("__OW_DEADLINE"), 10, 64)
 
-	if err != nil {
-		fmt.Println(err)
-	}
-
-	output2, err := json.Marshal(aw)
-	if err != nil {
-		fmt.Println(err)
-	}
-	fmt.Println("3")
-	fmt.Printf("%s", output2)
-
-	return output2
+	return json.Marshal(aw)
 
 }
 
