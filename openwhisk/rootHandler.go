@@ -10,46 +10,37 @@ import (
 	"strconv"
 )
 
-type value struct {
-	Name   string            `json:"name,omitempty"`
-	Main   string            `json:"main,omitempty"`
-	Code   string            `json:"code,omitempty"`
-	Binary bool              `json:"binary,omitempty"`
-	Env    map[string]string `json:"env,omitempty"`
-}
-
-type jsonString struct {
-	Value          value  `json:"value,omitempty"`
-	Namespace      string `json:"namespace,omitempty"`
-	Action_name    string `json:"action_name,omitempty"`
-	Api_host       string `json:"api_host,omitempty"`
-	Api_key        string `json:"api_key,omitempty"`
-	Activation_id  string `json:"activation_id,omitempty"`
-	Transaction_id string `json:"transaction_id,omitempty"`
-	Deadline       int64  `json:"deadline,omitempty"`
+type actionWrapper struct {
+	Value          map[string]interface{} `json:"value,omitempty"`
+	Namespace      string                 `json:"namespace,omitempty"`
+	Action_name    string                 `json:"action_name,omitempty"`
+	Api_host       string                 `json:"api_host,omitempty"`
+	Api_key        string                 `json:"api_key,omitempty"`
+	Activation_id  string                 `json:"activation_id,omitempty"`
+	Transaction_id string                 `json:"transaction_id,omitempty"`
+	Deadline       int64                  `json:"deadline,omitempty"`
 }
 
 func (ap *ActionProxy) rootHandler(w http.ResponseWriter, r *http.Request) {
 
-	var jsonByte []byte = preProcess(w, r)
+	var jsonByte []byte = preProcess(r)
 	var jsonStr string = fmt.Sprintf("%s", jsonByte)
 	if jsonStr != "" {
-		fmt.Println(jsonStr)
+		fmt.Sprintf("%s", jsonStr)
 	}
 
 }
 
 // prede una request e ritorna un json
-func preProcess(w http.ResponseWriter, r *http.Request) []byte {
+func preProcess(r *http.Request) []byte {
 
 	b, err := ioutil.ReadAll(r.Body)
 	defer r.Body.Close()
 	if err != nil {
-		http.Error(w, err.Error(), 500)
+		fmt.Println(err)
 	}
 
-	var val value
-	// var val map[string]interface{}
+	var val map[string]interface{}
 
 	err = json.Unmarshal(b, &val)
 	if err != nil {
@@ -63,32 +54,32 @@ func preProcess(w http.ResponseWriter, r *http.Request) []byte {
 		fmt.Println(err)
 	}
 
-	var jsonStr jsonString
+	var aw actionWrapper
 
 	valuStr := bytes.NewBuffer(output).String()
-	fmt.Println("valuStr: ", valuStr)
+	fmt.Sprintf("%s", valuStr)
 
-	jsonStr.Value = val
+	aw.Value = val
 
-	fmt.Println("jsonStr.Value: ", jsonStr.Value)
+	fmt.Sprintf("%s", aw.Value)
 
-	jsonStr.Namespace = os.Getenv("__OW_NAMESPACE")
-	jsonStr.Action_name = os.Getenv("__OW_ACTION_NAME")
-	jsonStr.Api_host = os.Getenv("__OW_API_HOST")
-	jsonStr.Api_key = os.Getenv("__OW_API_KEY")
-	jsonStr.Activation_id = os.Getenv("__OW_ACTIVATION_ID")
-	jsonStr.Transaction_id = os.Getenv("__OW_TRANSACTION_ID")
-	jsonStr.Deadline, err = strconv.ParseInt(os.Getenv("__OW_DEADLINE"), 10, 64)
+	aw.Namespace = os.Getenv("__OW_NAMESPACE")
+	aw.Action_name = os.Getenv("__OW_ACTION_NAME")
+	aw.Api_host = os.Getenv("__OW_API_HOST")
+	aw.Api_key = os.Getenv("__OW_API_KEY")
+	aw.Activation_id = os.Getenv("__OW_ACTIVATION_ID")
+	aw.Transaction_id = os.Getenv("__OW_TRANSACTION_ID")
+	aw.Deadline, err = strconv.ParseInt(os.Getenv("__OW_DEADLINE"), 10, 64)
 
 	if err != nil {
 		fmt.Println(err)
 	}
 
-	output2, err := json.Marshal(jsonStr)
+	output2, err := json.Marshal(aw)
 	if err != nil {
 		fmt.Println(err)
 	}
-	fmt.Println("jsonStr.Value: ", output2)
+	fmt.Sprintf("%s", output2)
 
 	return output2
 

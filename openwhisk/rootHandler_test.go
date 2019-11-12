@@ -1,9 +1,10 @@
 package openwhisk
 
 import (
-	"encoding/json"
 	"fmt"
+	"net/http"
 	"os"
+	"strings"
 )
 
 func ExampleRootHandler() {
@@ -23,7 +24,8 @@ func ExampleRootHandler() {
 
 	fmt.Println(res)
 
-	// Output: xxx
+	// Output:
+	// xxx
 
 	stopTestServer(ts, cur, log)
 }
@@ -41,10 +43,16 @@ func ExamplePreprocess() {
 	os.Setenv("transaction_id", "__OW_TRANSACTION_ID")
 	os.Setenv("deadline", "__OW_DEADLINE")
 
-	value := value{}
-	json.Unmarshal([]byte(jsonData), &value)
-	fmt.Println(value)
+	url := "http://127.0.0.1:8888"
+	r, err := http.NewRequest("GET", url, strings.NewReader(jsonData))
+	//r.Header.Set("Content-Type", "application/json")
+	if err != nil {
+		fmt.Println(err)
+	}
+	var jsonByte []byte = preProcess(r)
+	fmt.Sprintf("%s", jsonByte)
 
-	// Output: xxx
+	// Output:
+	// xxx
 
 }
