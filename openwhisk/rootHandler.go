@@ -49,6 +49,11 @@ func preProcess(r *http.Request) ([]byte, error) {
 
 	var aw actionWrapper
 
+	err = json.Unmarshal(body, &val)
+	if err != nil {
+		return nil, err
+	}
+
 	aw.Value = val
 	aw.Namespace = os.Getenv("__OW_NAMESPACE")
 	aw.Action_name = os.Getenv("__OW_ACTION_NAME")

@@ -45,7 +45,7 @@ func ExamplePreprocess() {
 	fmt.Printf("%s", out)
 
 	// Output:
-	// xxx
+
 	// {"value":{"hello":"world"},"namespace":"__namespace__","action_name":"__action_name__","api_host":"__api_host__","api_key":"__api_key__","activation_id":"__activation_id__","transaction_id":"__transaction_id__"}
 
 }
