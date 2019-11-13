@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"fmt"
 	"net/http"
+	"net/http/httptest"
 	"os"
 )
 
@@ -45,7 +46,33 @@ func ExamplePreprocess() {
 	fmt.Printf("%s", out)
 
 	// Output:
-
+	// xxx
 	// {"value":{"hello":"world"},"namespace":"__namespace__","action_name":"__action_name__","api_host":"__api_host__","api_key":"__api_key__","activation_id":"__activation_id__","transaction_id":"__transaction_id__"}
 
+}
+
+func ExamplePostprocess() {
+
+	data := bytes.NewBuffer([]byte(`{"__ow_method":"post",
+									 "__ow_query":"name=Jane",
+									 "__ow_body":"eyJuYW1lIjoiSmFuZSJ9",
+									 "__ow_headers":{"accept":"*/*",
+													 "connection":"close",
+													 "content-length":"15",
+													 "content-type":"application/json",
+													 "host":"172.17.0.1",
+													 "user-agent":"curl/7.43.0"},
+									 "__ow_path": ""}`))
+
+	fmt.Printf("%s", data)
+
+	rw := httptest.NewRecorder()
+
+	res := postProcess(data.Bytes(), rw)
+
+	fmt.Printf("%s", res.Body)
+
+	// Output:
+
+	// xxx
 }

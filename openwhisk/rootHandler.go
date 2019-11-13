@@ -20,6 +20,14 @@ type actionWrapper struct {
 	Deadline       int64                  `json:"deadline,omitempty"`
 }
 
+type actionWrapperResponse struct {
+	__ow_method  string                 `json:"__ow_method,omitempty"`
+	__ow_query   string                 `json:"__ow_query,omitempty"`
+	__ow_body    string                 `json:"__ow_body,omitempty"`
+	__ow_headers map[string]interface{} `json:"__ow_headers,omitempty"`
+	__ow_path    string                 `json:"__ow_path,omitempty"`
+}
+
 func (ap *ActionProxy) rootHandler(w http.ResponseWriter, r *http.Request) {
 
 	jsonByte, err := preProcess(r)
@@ -42,11 +50,6 @@ func preProcess(r *http.Request) ([]byte, error) {
 
 	var val map[string]interface{}
 
-	err = json.Unmarshal(body, &val)
-	if err != nil {
-		fmt.Println(err)
-	}
-
 	var aw actionWrapper
 
 	err = json.Unmarshal(body, &val)
@@ -67,10 +70,28 @@ func preProcess(r *http.Request) ([]byte, error) {
 
 }
 
-/*
-
+// https://github.com/apache/openwhisk/blob/master/docs/webactions.md
 // prende un json e ritorna una response
-func postProcess(res *http.Response) (jsonString string) {
+func postProcess(bt []byte, w http.ResponseWriter) (res *http.Response) {
+
+	fmt.Printf("%s", bt)
+
+	awr := actionWrapperResponse{}
+
+	err := json.NewDecoder(res.Body).Decode(&awr)
+	if err != nil {
+		panic(err)
+	}
+
+	awrJSON, err := json.Marshal(awr)
+	if err != nil {
+		panic(err)
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	w.Write(awrJSON)
+
+	return res
 
 }
-*/
