@@ -68,11 +68,11 @@ func ExamplePostprocess() {
 
 	rw := httptest.NewRecorder()
 
-	res := postProcess(data.Bytes(), rw)
+	err := postProcess(data.Bytes(), rw)
 
-	fmt.Printf("%s", res.Body)
+	fmt.Printf("%s", err)
 
 	// Output:
 
-	// xxx
+	// -
 }

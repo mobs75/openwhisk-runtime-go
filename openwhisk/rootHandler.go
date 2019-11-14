@@ -20,7 +20,7 @@ type actionWrapper struct {
 	Deadline       int64                  `json:"deadline,omitempty"`
 }
 
-type actionWrapperResponse struct {
+type actionResponse struct {
 	__ow_method  string                 `json:"__ow_method,omitempty"`
 	__ow_query   string                 `json:"__ow_query,omitempty"`
 	__ow_body    string                 `json:"__ow_body,omitempty"`
@@ -72,26 +72,18 @@ func preProcess(r *http.Request) ([]byte, error) {
 
 // https://github.com/apache/openwhisk/blob/master/docs/webactions.md
 // prende un json e ritorna una response
-func postProcess(bt []byte, w http.ResponseWriter) (res *http.Response) {
+func postProcess(bt []byte, w http.ResponseWriter) error {
 
-	fmt.Printf("%s", bt)
+	ar := actionResponse{}
 
-	awr := actionWrapperResponse{}
-
-	err := json.NewDecoder(res.Body).Decode(&awr)
+	err := json.Unmarshal(bt, &ar)
 	if err != nil {
-		panic(err)
+		return err
 	}
-
-	awrJSON, err := json.Marshal(awr)
-	if err != nil {
-		panic(err)
-	}
-
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
-	w.Write(awrJSON)
+	w.Write(bt)
 
-	return res
+	return err
 
 }
