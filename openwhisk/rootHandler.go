@@ -70,8 +70,7 @@ func preProcess(r *http.Request) ([]byte, error) {
 
 }
 
-// https://github.com/apache/openwhisk/blob/master/docs/webactions.md
-// prende un json e ritorna una response
+// transforms json in a response
 func postProcess(bt []byte, w http.ResponseWriter) error {
 
 	ar := actionResponse{}
@@ -80,6 +79,7 @@ func postProcess(bt []byte, w http.ResponseWriter) error {
 	if err != nil {
 		return err
 	}
+
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
 	w.Write(bt)

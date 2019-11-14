@@ -54,25 +54,35 @@ func ExamplePreprocess() {
 func ExamplePostprocess() {
 
 	data := bytes.NewBuffer([]byte(`{"__ow_method":"post",
-									 "__ow_query":"name=Jane",
-									 "__ow_body":"eyJuYW1lIjoiSmFuZSJ9",
-									 "__ow_headers":{"accept":"*/*",
-													 "connection":"close",
-													 "content-length":"15",
-													 "content-type":"application/json",
-													 "host":"172.17.0.1",
-													 "user-agent":"curl/7.43.0"},
-									 "__ow_path": ""}`))
-
-	fmt.Printf("%s", data)
+"__ow_query":"name=Jane",
+"__ow_body":"eyJuYW1lIjoiSmFuZSJ9",
+"__ow_headers":{"accept":"*/*",
+"connection":"close",
+"content-length":"15",
+"content-type":"application/json",
+"host":"172.17.0.1",
+"user-agent":"curl/7.43.0"},
+"__ow_path": ""}`))
 
 	rw := httptest.NewRecorder()
 
 	err := postProcess(data.Bytes(), rw)
 
-	fmt.Printf("%s", err)
+	fmt.Println(err)
+
+	fmt.Println(rw.Body)
 
 	// Output:
+	// <nil>
+	// {"__ow_method":"post",
+	// "__ow_query":"name=Jane",
+	// "__ow_body":"eyJuYW1lIjoiSmFuZSJ9",
+	// "__ow_headers":{"accept":"*/*",
+	// "connection":"close",
+	// "content-length":"15",
+	// "content-type":"application/json",
+	// "host":"172.17.0.1",
+	// "user-agent":"curl/7.43.0"},
+	// "__ow_path": ""}
 
-	// -
 }
