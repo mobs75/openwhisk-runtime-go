@@ -39,7 +39,7 @@ func (ap *ActionProxy) rootHandler(w http.ResponseWriter, r *http.Request) {
 
 }
 
-// preProcess transforms a request in an action value
+// preProcess: transforms a request in an action value
 func preProcess(r *http.Request) ([]byte, error) {
 
 	body, err := ioutil.ReadAll(r.Body)
@@ -70,7 +70,7 @@ func preProcess(r *http.Request) ([]byte, error) {
 
 }
 
-// transforms json in a response
+// postProcess: transforms json in a response
 func postProcess(bt []byte, w http.ResponseWriter) error {
 
 	ar := actionResponse{}

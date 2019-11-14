@@ -25,7 +25,7 @@ func ExampleRootHandler() {
 	fmt.Println(res)
 
 	// Output:
-	// xxx
+	//-
 
 	stopTestServer(ts, cur, log)
 }
