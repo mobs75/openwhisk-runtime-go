@@ -21,11 +21,11 @@ type actionWrapper struct {
 }
 
 type actionResponse struct {
-	__ow_method  string                 `json:"__ow_method,omitempty"`
-	__ow_query   string                 `json:"__ow_query,omitempty"`
-	__ow_body    string                 `json:"__ow_body,omitempty"`
-	__ow_headers map[string]interface{} `json:"__ow_headers,omitempty"`
-	__ow_path    string                 `json:"__ow_path,omitempty"`
+	Method  string                 `json:"__ow_method,omitempty"`
+	Query   string                 `json:"__ow_query,omitempty"`
+	Body    string                 `json:"__ow_body,omitempty"`
+	Headers map[string]interface{} `json:"__ow_headers,omitempty"`
+	Path    string                 `json:"__ow_path,omitempty"`
 }
 
 func (ap *ActionProxy) rootHandler(w http.ResponseWriter, r *http.Request) {
@@ -80,9 +80,34 @@ func postProcess(bt []byte, w http.ResponseWriter) error {
 		return err
 	}
 
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusOK)
-	w.Write(bt)
+	// start set Headers fields
+	accept := ar.Headers["accept"].(string)
+	fmt.Println("accept: " + accept)
+	w.Header().Set("accept", accept)
+
+	connection := ar.Headers["connection"].(string)
+	fmt.Println("connection: " + connection)
+	w.Header().Set("connection", connection)
+
+	contentType := ar.Headers["content-type"].(string)
+	fmt.Println("content-type: " + contentType)
+	w.Header().Set("content-type", contentType)
+
+	host := ar.Headers["host"].(string)
+	fmt.Println("host: " + host)
+	w.Header().Set("host", host)
+
+	userAgent := ar.Headers["user-agent"].(string)
+	fmt.Println("user-agent: " + userAgent)
+	w.Header().Set("user-agent", userAgent)
+
+	// end set Headers fields
+
+	//w.WriteHeader(http.StatusOK)
+
+	// write body
+	body := []byte(ar.Body)
+	w.Write(body)
 
 	return err
 
