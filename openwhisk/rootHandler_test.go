@@ -40,7 +40,6 @@ func ExampleRootHandler() {
 	stopTestServer(ts, cur, log)
 
 	// Output:
-	//-
 	// {"value":{"hello":"world"},"namespace":"__namespace__","action_name":"__action_name__","api_host":"__api_host__","api_key":"__api_key__","activation_id":"__activation_id__","transaction_id":"__transaction_id__"}
 	// <nil>
 	// eyJuYW1lIjoiSmFuZSJ9
