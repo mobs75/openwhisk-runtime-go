@@ -97,11 +97,12 @@ func postProcess(bt []byte, w http.ResponseWriter) error {
 	w.Header().Set("user-agent", userAgent)
 	// end set Headers fields
 
-	//w.WriteHeader(http.StatusOK)
-
 	// write body
 	body := []byte(ar.Body)
 	w.Write(body)
+
+	w.WriteHeader(http.StatusInternalServerError)
+	w.Write([]byte("500 - Internal Server Error"))
 
 	return err
 
