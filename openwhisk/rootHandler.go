@@ -37,6 +37,9 @@ func (ap *ActionProxy) rootHandler(w http.ResponseWriter, r *http.Request) {
 		fmt.Println(err)
 	}
 
+	err = postProcess(jsonByte, w)
+	fmt.Println(err)
+
 }
 
 // preProcess: transforms a request in an action value
