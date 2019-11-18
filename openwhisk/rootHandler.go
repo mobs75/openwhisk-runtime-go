@@ -101,8 +101,7 @@ func postProcess(bt []byte, w http.ResponseWriter) error {
 	body := []byte(ar.Body)
 	w.Write(body)
 
-	w.WriteHeader(http.StatusInternalServerError)
-	w.Write([]byte("500 - Internal Server Error"))
+	w.WriteHeader(http.StatusOK)
 
 	return err
 
