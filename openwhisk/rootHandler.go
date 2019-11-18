@@ -82,25 +82,19 @@ func postProcess(bt []byte, w http.ResponseWriter) error {
 
 	// start set Headers fields
 	accept := ar.Headers["accept"].(string)
-	fmt.Println("accept: " + accept)
 	w.Header().Set("accept", accept)
 
 	connection := ar.Headers["connection"].(string)
-	fmt.Println("connection: " + connection)
 	w.Header().Set("connection", connection)
 
 	contentType := ar.Headers["content-type"].(string)
-	fmt.Println("content-type: " + contentType)
 	w.Header().Set("content-type", contentType)
 
 	host := ar.Headers["host"].(string)
-	fmt.Println("host: " + host)
 	w.Header().Set("host", host)
 
 	userAgent := ar.Headers["user-agent"].(string)
-	fmt.Println("user-agent: " + userAgent)
 	w.Header().Set("user-agent", userAgent)
-
 	// end set Headers fields
 
 	//w.WriteHeader(http.StatusOK)

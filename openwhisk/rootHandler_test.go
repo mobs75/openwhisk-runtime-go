@@ -70,18 +70,10 @@ func ExamplePostprocess() {
 	fmt.Println(err)
 
 	fmt.Println(rw.Body)
+	fmt.Println(rw.Header())
 
 	// Output:
 	// <nil>
-	// {"__ow_method":"post",
-	// "__ow_query":"name=Jane",
-	// "__ow_body":"eyJuYW1lIjoiSmFuZSJ9",
-	// "__ow_headers":{"accept":"*/*",
-	// "connection":"close",
-	// "content-length":"15",
-	// "content-type":"application/json",
-	// "host":"172.17.0.1",
-	// "user-agent":"curl/7.43.0"},
-	// "__ow_path": ""}
-
+	// eyJuYW1lIjoiSmFuZSJ9
+	// map[Accept:[*/*] Connection:[close] Content-Type:[application/json] Host:[172.17.0.1] User-Agent:[curl/7.43.0]]
 }
