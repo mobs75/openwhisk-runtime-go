@@ -91,13 +91,13 @@ func ExamplePostprocess() {
 
 	fmt.Println(err)
 
-	fmt.Println(rw.Result().StatusCode)
-	fmt.Println(rw.HeaderMap)
+	fmt.Println(rw.Header())
 	fmt.Println(rw.Body)
+	fmt.Println(rw.Result().StatusCode)
 
 	// Output:
 	// <nil>
-	// 200
 	// map[Connection:[close] Content-Type:[application/json]]
 	// params
+	// 200
 }

@@ -91,18 +91,19 @@ func postProcess(bt []byte, w http.ResponseWriter) error {
 		return err
 	}
 
-	// write StatusCode
-	if ar.StatusCode != 200 {
-		http.Error(w, http.StatusText(ar.StatusCode), ar.StatusCode)
-	}
-
 	// write body
 	body := []byte(ar.Body)
 	w.Write(body)
 
 	// write header
 	for k, v := range ar.Headers {
+		//fmt.Printf("key[%s] value[%s]\n", k, v)
 		w.Header().Add(k, fmt.Sprintf("%v", v))
+	}
+
+	// write StatusCode
+	if ar.StatusCode != 200 {
+		http.Error(w, http.StatusText(ar.StatusCode), ar.StatusCode)
 	}
 
 	return err
