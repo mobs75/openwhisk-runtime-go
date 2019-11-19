@@ -69,16 +69,21 @@ func ExamplePreprocess() {
 
 func ExamplePostprocess() {
 
-	data := bytes.NewBuffer([]byte(`{"__ow_method":"post",
-"__ow_query":"name=Jane",
-"__ow_body":"eyJuYW1lIjoiSmFuZSJ9",
-"__ow_headers":{"accept":"*/*",
-"connection":"close",
-"content-length":"15",
-"content-type":"application/json",
-"host":"172.17.0.1",
-"user-agent":"curl/7.43.0"},
-"__ow_path": ""}`))
+	//	data := bytes.NewBuffer([]byte(`{"__ow_method":"post",
+	//"__ow_query":"name=Jane",
+	//"__ow_body":"eyJuYW1lIjoiSmFuZSJ9",
+	//"__ow_headers":{"accept":"*/*",
+	//"connection":"close",
+	//"content-length":"15",
+	//"content-type":"application/json",
+	//"host":"172.17.0.1",
+	//"user-agent":"curl/7.43.0"},
+	//"__ow_path": ""}`))
+
+	data := bytes.NewBuffer([]byte(`{"statusCode":200,
+	   "headers":{"connection":"close",
+	   "content-Type":"application/json"},
+	   "body":"params"}`))
 
 	rw := httptest.NewRecorder()
 
@@ -86,11 +91,13 @@ func ExamplePostprocess() {
 
 	fmt.Println(err)
 
+	fmt.Println(rw.Result().StatusCode)
+	fmt.Println(rw.HeaderMap)
 	fmt.Println(rw.Body)
-	fmt.Println(rw.Header())
 
 	// Output:
 	// <nil>
-	// eyJuYW1lIjoiSmFuZSJ9
-	// map[Accept:[*/*] Connection:[close] Content-Type:[application/json] Host:[172.17.0.1] User-Agent:[curl/7.43.0]]
+	// 200
+	// map[Connection:[close] Content-Type:[application/json]]
+	// params
 }

@@ -20,12 +20,20 @@ type actionWrapper struct {
 	Deadline       int64                  `json:"deadline,omitempty"`
 }
 
+/*
 type actionResponse struct {
 	Method  string                 `json:"__ow_method,omitempty"`
 	Query   string                 `json:"__ow_query,omitempty"`
 	Body    string                 `json:"__ow_body,omitempty"`
 	Headers map[string]interface{} `json:"__ow_headers,omitempty"`
 	Path    string                 `json:"__ow_path,omitempty"`
+}
+*/
+
+type actionResponse struct {
+	StatusCode int                    `json:"statusCode,omitempty"`
+	Headers    map[string]interface{} `json:"headers,omitempty"`
+	Body       string                 `json:"body,omitempty"`
 }
 
 func (ap *ActionProxy) rootHandler(w http.ResponseWriter, r *http.Request) {
@@ -83,28 +91,19 @@ func postProcess(bt []byte, w http.ResponseWriter) error {
 		return err
 	}
 
-	// start set Headers fields
-	accept := ar.Headers["accept"].(string)
-	w.Header().Set("accept", accept)
-
-	connection := ar.Headers["connection"].(string)
-	w.Header().Set("connection", connection)
-
-	contentType := ar.Headers["content-type"].(string)
-	w.Header().Set("content-type", contentType)
-
-	host := ar.Headers["host"].(string)
-	w.Header().Set("host", host)
-
-	userAgent := ar.Headers["user-agent"].(string)
-	w.Header().Set("user-agent", userAgent)
-	// end set Headers fields
+	// write StatusCode
+	if ar.StatusCode != 200 {
+		http.Error(w, http.StatusText(ar.StatusCode), ar.StatusCode)
+	}
 
 	// write body
 	body := []byte(ar.Body)
 	w.Write(body)
 
-	w.WriteHeader(http.StatusOK)
+	// write header
+	for k, v := range ar.Headers {
+		w.Header().Add(k, fmt.Sprintf("%v", v))
+	}
 
 	return err
 
