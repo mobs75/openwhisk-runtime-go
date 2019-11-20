@@ -24,6 +24,7 @@ func ExampleRootHandler() {
 
 	data := bytes.NewBuffer([]byte(`{"name":"Mike"}`))
 	r, _ := http.NewRequest("POST", "", data)
+
 	// call postProcess
 	out, _ := preProcess(r)
 	fmt.Printf("%s", out)
@@ -31,6 +32,7 @@ func ExampleRootHandler() {
 	rw := httptest.NewRecorder()
 	// call postProcess
 	err := postProcess(out, rw)
+
 	fmt.Println(err)
 	fmt.Println(rw.Header())
 	fmt.Println(rw.Body)
@@ -41,6 +43,7 @@ func ExampleRootHandler() {
 	stopTestServer(ts, cur, log)
 
 	// Output:
+	//-
 	// {"value":{"hello":"world"},"namespace":"__namespace__","action_name":"__action_name__","api_host":"__api_host__","api_key":"__api_key__","activation_id":"__activation_id__","transaction_id":"__transaction_id__"}
 	// <nil>
 	// map[Connection:[close] Content-Type:[application/json]]

@@ -1,6 +1,7 @@
 package openwhisk
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
@@ -8,6 +9,10 @@ import (
 	"os"
 	"strconv"
 )
+
+type ErrResponseRootHandler struct {
+	Error string `json:"error"`
+}
 
 type actionWrapper struct {
 	Value          map[string]interface{} `json:"value,omitempty"`
@@ -36,17 +41,99 @@ type actionResponse struct {
 	Body       string                 `json:"body,omitempty"`
 }
 
-func (ap *ActionProxy) rootHandler(w http.ResponseWriter, r *http.Request) {
+func sendErrorRootHandler(w http.ResponseWriter, code int, cause string) {
 
-	jsonByte, err := preProcess(r)
+	errResponse := ErrResponseRootHandler{Error: cause}
+	b, err := json.Marshal(errResponse)
+
 	if err != nil {
-		fmt.Printf("%s", jsonByte)
-	} else {
-		fmt.Println(err)
+		b = []byte("error marshalling error response")
+		Debug(err.Error())
 	}
 
-	err = postProcess(jsonByte, w)
-	fmt.Println(err)
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(code)
+	w.Write(b)
+	w.Write([]byte("\n"))
+}
+
+func (ap *ActionProxy) rootHandler(w http.ResponseWriter, r *http.Request) {
+
+	// parse the request
+	/*
+		body, err := ioutil.ReadAll(r.Body)
+		defer r.Body.Close()
+	*/
+
+	// call preProcess
+	jsonByte, err := preProcess(r)
+
+	if err != nil {
+		sendErrorRootHandler(w, http.StatusBadRequest, fmt.Sprintf("Error reading request body: %v", err))
+		return
+	}
+
+	//Debug("done reading %d bytes", len(body))
+	Debug("done reading %d bytes", len(jsonByte))
+
+	// check if you have an action
+	if ap.theExecutor == nil {
+		sendErrorRootHandler(w, http.StatusInternalServerError, fmt.Sprintf("no action defined yet"))
+		return
+	}
+
+	// check if the process exited
+	if ap.theExecutor.Exited() {
+		sendErrorRootHandler(w, http.StatusInternalServerError, fmt.Sprintf("command exited"))
+		return
+	}
+
+	// remove newlines
+	//body = bytes.Replace(body, []byte("\n"), []byte(""), -1)
+	jsonByte = bytes.Replace(jsonByte, []byte("\n"), []byte(""), -1)
+
+	// execute the action
+	response, err := ap.theExecutor.Interact(jsonByte)
+
+	// call postProcess
+	err = postProcess(response, w)
+
+	// check for early termination
+	if err != nil {
+		Debug("WARNING! Command exited")
+		ap.theExecutor = nil
+		sendErrorRootHandler(w, http.StatusBadRequest, fmt.Sprintf("command exited"))
+		return
+	}
+	DebugLimit("received:", response, 120)
+
+	// check if the answer is an object map
+	var objmap map[string]*json.RawMessage
+	err = json.Unmarshal(response, &objmap)
+	if err != nil {
+		sendErrorRootHandler(w, http.StatusBadGateway, "The action did not return a dictionary.")
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.Header().Set("Content-Length", fmt.Sprintf("%d", len(response)))
+	numBytesWritten, err := w.Write(response)
+
+	// flush output
+	if f, ok := w.(http.Flusher); ok {
+		f.Flush()
+	}
+
+	// diagnostic when you have writing problems
+	if err != nil {
+		sendErrorRootHandler(w, http.StatusInternalServerError, fmt.Sprintf("Error writing response: %v", err))
+		return
+	}
+
+	if numBytesWritten != len(response) {
+		sendErrorRootHandler(w, http.StatusInternalServerError, fmt.Sprintf("Only wrote %d of %d bytes to response", numBytesWritten, len(response)))
+		return
+	}
 
 }
 
@@ -81,7 +168,7 @@ func preProcess(r *http.Request) ([]byte, error) {
 
 }
 
-// postProcess: transforms json in a response
+// postProcess: transforms action value in a response
 func postProcess(bt []byte, w http.ResponseWriter) error {
 
 	ar := actionResponse{}
