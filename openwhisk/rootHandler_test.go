@@ -10,9 +10,7 @@ import (
 
 func ExampleRootHandler() {
 
-	ts, cur, log := startTestServer("")
-
-	res, _, _ := doPost(ts.URL+"/", "hello")
+	// set variables
 
 	os.Setenv("__OW_NAMESPACE", "__namespace__")
 	os.Setenv("__OW_ACTION_NAME", "__action_name__")
@@ -22,33 +20,19 @@ func ExampleRootHandler() {
 	os.Setenv("__OW_TRANSACTION_ID", "__transaction_id__")
 	os.Setenv("__OW_DEADLINE", "__deadline__")
 
-	data := bytes.NewBuffer([]byte(`{"name":"Mike"}`))
-	r, _ := http.NewRequest("POST", "", data)
+	ts, cur, log := startTestServer("")
 
-	// call postProcess
-	out, _ := preProcess(r)
-	fmt.Printf("%s", out)
+	// inizialize action that return a body
+	doInit(ts, initCode("_test/knative1.src", "main"))
 
-	rw := httptest.NewRecorder()
-	// call postProcess
-	err := postProcess(out, rw)
-
-	fmt.Println(err)
-	fmt.Println(rw.Header())
-	fmt.Println(rw.Body)
-	fmt.Println(rw.Result().StatusCode)
-
+	// execute doPost to rootHandler
+	res, _, _ := doPost(ts.URL+"/", `{}`)
 	fmt.Println(res)
 
 	stopTestServer(ts, cur, log)
 
 	// Output:
 	//-
-	// {"value":{"hello":"world"},"namespace":"__namespace__","action_name":"__action_name__","api_host":"__api_host__","api_key":"__api_key__","activation_id":"__activation_id__","transaction_id":"__transaction_id__"}
-	// <nil>
-	// map[Connection:[close] Content-Type:[application/json]]
-	// params
-	// 200
 
 }
 

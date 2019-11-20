@@ -110,6 +110,7 @@ func (ap *ActionProxy) rootHandler(w http.ResponseWriter, r *http.Request) {
 	// check if the answer is an object map
 	var objmap map[string]*json.RawMessage
 	err = json.Unmarshal(response, &objmap)
+
 	if err != nil {
 		sendErrorRootHandler(w, http.StatusBadGateway, "The action did not return a dictionary.")
 		return
@@ -117,6 +118,7 @@ func (ap *ActionProxy) rootHandler(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Set("Content-Type", "application/json")
 	w.Header().Set("Content-Length", fmt.Sprintf("%d", len(response)))
+
 	numBytesWritten, err := w.Write(response)
 
 	// flush output
