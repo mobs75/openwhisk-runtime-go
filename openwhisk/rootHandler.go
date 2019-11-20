@@ -97,8 +97,7 @@ func postProcess(bt []byte, w http.ResponseWriter) error {
 
 	// write header
 	for k, v := range ar.Headers {
-		//fmt.Printf("key[%s] value[%s]\n", k, v)
-		w.Header().Add(k, fmt.Sprintf("%v", v))
+		w.Header().Set(k, fmt.Sprintf("%v", v))
 	}
 
 	// write StatusCode

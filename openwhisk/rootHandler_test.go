@@ -32,8 +32,9 @@ func ExampleRootHandler() {
 	// call postProcess
 	err := postProcess(out, rw)
 	fmt.Println(err)
-	fmt.Println(rw.Body)
 	fmt.Println(rw.Header())
+	fmt.Println(rw.Body)
+	fmt.Println(rw.Result().StatusCode)
 
 	fmt.Println(res)
 
@@ -42,8 +43,9 @@ func ExampleRootHandler() {
 	// Output:
 	// {"value":{"hello":"world"},"namespace":"__namespace__","action_name":"__action_name__","api_host":"__api_host__","api_key":"__api_key__","activation_id":"__activation_id__","transaction_id":"__transaction_id__"}
 	// <nil>
-	// eyJuYW1lIjoiSmFuZSJ9
-	// map[Accept:[*/*] Connection:[close] Content-Type:[application/json] Host:[172.17.0.1] User-Agent:[curl/7.43.0]]
+	// map[Connection:[close] Content-Type:[application/json]]
+	// params
+	// 200
 
 }
 
@@ -82,7 +84,7 @@ func ExamplePostprocess() {
 
 	data := bytes.NewBuffer([]byte(`{"statusCode":200,
 	   "headers":{"connection":"close",
-	   "content-Type":"application/json"},
+	   "Content-Type":"application/json"},
 	   "body":"params"}`))
 
 	rw := httptest.NewRecorder()
