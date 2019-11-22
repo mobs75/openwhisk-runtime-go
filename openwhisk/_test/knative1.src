@@ -1,4 +1,5 @@
 package main
+
 func Main(args map[string]interface{}) map[string]interface{} {
 	res := make(map[string]interface{})
 	res["body"] = "Hello, World"

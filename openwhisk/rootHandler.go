@@ -25,16 +25,6 @@ type actionWrapper struct {
 	Deadline       int64                  `json:"deadline,omitempty"`
 }
 
-/*
-type actionResponse struct {
-	Method  string                 `json:"__ow_method,omitempty"`
-	Query   string                 `json:"__ow_query,omitempty"`
-	Body    string                 `json:"__ow_body,omitempty"`
-	Headers map[string]interface{} `json:"__ow_headers,omitempty"`
-	Path    string                 `json:"__ow_path,omitempty"`
-}
-*/
-
 type actionResponse struct {
 	StatusCode int                    `json:"statusCode,omitempty"`
 	Headers    map[string]interface{} `json:"headers,omitempty"`
@@ -59,23 +49,6 @@ func sendErrorRootHandler(w http.ResponseWriter, code int, cause string) {
 
 func (ap *ActionProxy) rootHandler(w http.ResponseWriter, r *http.Request) {
 
-	// parse the request
-	/*
-		body, err := ioutil.ReadAll(r.Body)
-		defer r.Body.Close()
-	*/
-
-	// call preProcess
-	jsonByte, err := preProcess(r)
-
-	if err != nil {
-		sendErrorRootHandler(w, http.StatusBadRequest, fmt.Sprintf("Error reading request body: %v", err))
-		return
-	}
-
-	//Debug("done reading %d bytes", len(body))
-	Debug("done reading %d bytes", len(jsonByte))
-
 	// check if you have an action
 	if ap.theExecutor == nil {
 		sendErrorRootHandler(w, http.StatusInternalServerError, fmt.Sprintf("no action defined yet"))
@@ -88,16 +61,20 @@ func (ap *ActionProxy) rootHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// call preProcess
+	jsonByte, err := preProcess(r)
+
+	if err != nil {
+		sendErrorRootHandler(w, http.StatusBadRequest, fmt.Sprintf("Error preprocessing: %v", err))
+		return
+	}
+	Debug("done reading %d bytes", len(jsonByte))
+
 	// remove newlines
-	//body = bytes.Replace(body, []byte("\n"), []byte(""), -1)
 	jsonByte = bytes.Replace(jsonByte, []byte("\n"), []byte(""), -1)
 
 	// execute the action
 	response, err := ap.theExecutor.Interact(jsonByte)
-
-	// call postProcess
-	err = postProcess(response, w)
-
 	// check for early termination
 	if err != nil {
 		Debug("WARNING! Command exited")
@@ -105,38 +82,15 @@ func (ap *ActionProxy) rootHandler(w http.ResponseWriter, r *http.Request) {
 		sendErrorRootHandler(w, http.StatusBadRequest, fmt.Sprintf("command exited"))
 		return
 	}
+
+	// call postProcess
+	err = postProcess(response, w)
 	DebugLimit("received:", response, 120)
-
-	// check if the answer is an object map
-	var objmap map[string]*json.RawMessage
-	err = json.Unmarshal(response, &objmap)
-
-	if err != nil {
-		sendErrorRootHandler(w, http.StatusBadGateway, "The action did not return a dictionary.")
-		return
-	}
-
-	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("Content-Length", fmt.Sprintf("%d", len(response)))
-
-	numBytesWritten, err := w.Write(response)
 
 	// flush output
 	if f, ok := w.(http.Flusher); ok {
 		f.Flush()
 	}
-
-	// diagnostic when you have writing problems
-	if err != nil {
-		sendErrorRootHandler(w, http.StatusInternalServerError, fmt.Sprintf("Error writing response: %v", err))
-		return
-	}
-
-	if numBytesWritten != len(response) {
-		sendErrorRootHandler(w, http.StatusInternalServerError, fmt.Sprintf("Only wrote %d of %d bytes to response", numBytesWritten, len(response)))
-		return
-	}
-
 }
 
 // preProcess: transforms a request in an action value

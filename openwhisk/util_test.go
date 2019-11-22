@@ -21,6 +21,7 @@ import (
 	"bytes"
 	"encoding/base64"
 	"encoding/json"
+	"flag"
 	"fmt"
 	"io/ioutil"
 	"log"
@@ -183,9 +184,17 @@ func removeLineNr(out string) string {
 	var re = regexp.MustCompile(`:\d+:\d+`)
 	return re.ReplaceAllString(out, "::")
 }
+
+var DebugTest = flag.Bool("debug", false, "debug test")
+
 func TestMain(m *testing.M) {
-	Debugging = false // enable debug of tests
-	if !Debugging {
+	/* If you run the tests with -args -debug
+	  or you add to the vscode go.testFlags, 
+	  you will see logs AND it will not rebuild support binaries at every step
+	  BUT you have to run go test without the flag at least once for a fresh repo
+	*/
+	flag.Parse()
+	if !*DebugTest {
 		// silence those annoying tests
 		log.SetOutput(ioutil.Discard)
 		// build support files

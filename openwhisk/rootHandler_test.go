@@ -6,12 +6,12 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"os"
+	"path/filepath"
 )
 
 func ExampleRootHandler() {
 
 	// set variables
-
 	os.Setenv("__OW_NAMESPACE", "__namespace__")
 	os.Setenv("__OW_ACTION_NAME", "__action_name__")
 	os.Setenv("__OW_API_HOST", "__api_host__")
@@ -20,19 +20,25 @@ func ExampleRootHandler() {
 	os.Setenv("__OW_TRANSACTION_ID", "__transaction_id__")
 	os.Setenv("__OW_DEADLINE", "__deadline__")
 
-	ts, cur, log := startTestServer("")
+	comp, _ := filepath.Abs("../common/gobuild.py")
+	ts, cur, log := startTestServer(comp)
 
 	// inizialize action that return a body
-	doInit(ts, initCode("_test/knative1.src", "main"))
+	doInit(ts, initCode("_test/knative1.src", ""))
 
 	// execute doPost to rootHandler
 	res, _, _ := doPost(ts.URL+"/", `{}`)
 	fmt.Println(res)
 
+	// done
 	stopTestServer(ts, cur, log)
 
 	// Output:
-	//-
+	//200 {"ok":true}
+	// Hello, World
+	//
+	// XXX_THE_END_OF_A_WHISK_ACTIVATION_XXX
+	// XXX_THE_END_OF_A_WHISK_ACTIVATION_XXX
 
 }
 
@@ -53,7 +59,6 @@ func ExamplePreprocess() {
 
 	// Output:
 	// {"value":{"hello":"world"},"namespace":"__namespace__","action_name":"__action_name__","api_host":"__api_host__","api_key":"__api_key__","activation_id":"__activation_id__","transaction_id":"__transaction_id__"}
-
 }
 
 func ExamplePostprocess() {
@@ -69,15 +74,15 @@ func ExamplePostprocess() {
 	//"user-agent":"curl/7.43.0"},
 	//"__ow_path": ""}`))
 
-	data := bytes.NewBuffer([]byte(`{"statusCode":200,
-	   "headers":{"connection":"close",
-	   "Content-Type":"application/json"},
-	   "body":"params"}`))
+	data := bytes.NewBuffer([]byte(`{
+ "statusCode": 200,
+ "headers": {"Content-Type": "text/plain"},
+ "body": "Hello!"
+}`))
 
 	rw := httptest.NewRecorder()
 
 	err := postProcess(data.Bytes(), rw)
-
 	fmt.Println(err)
 
 	fmt.Println(rw.Header())
@@ -86,7 +91,7 @@ func ExamplePostprocess() {
 
 	// Output:
 	// <nil>
-	// map[Connection:[close] Content-Type:[application/json]]
-	// params
+	// map[Content-Type:[text/plain]]
+	// Hello!
 	// 200
 }
